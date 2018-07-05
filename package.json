@@ -1,0 +1,12 @@
+{
+  "name": "browser-nodejs-es6",
+  "version": "1.0.0",
+  "description": "Example of how to share ES6 modules between browsers and Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
