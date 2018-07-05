@@ -242,9 +242,10 @@ main.js:3 Hello, ES6
 
 ### ES6 in Node.js
 
-You might have read that Node.js supports ES6 module too for quite a while, but
+You might have read that Node.js supports ES6 modules too for quite a while, but
 it had to be enabled with the `--experimental-modules` flag and such modules
-should have the `.mjs` extension.
+should have the `.mjs` extension as documented here:
+https://nodejs.org/api/esm.html
 
 Let's try it, but to ensure we are working with the same code in the browser
 and in Node.js, let's create a link:
@@ -252,9 +253,6 @@ and in Node.js, let's create a link:
 
 ```
 ⋊> ln -s main.js main.mjs
-```
-
-```
 ⋊> node --experimental-modules main.mjs
 /Users/xxx/.../browser-nodejs-es6/main.js:1
 (function (exports, require, module, __filename, __dirname) { import * as App from './app.js'
@@ -306,3 +304,30 @@ Failed to load module script: The server responded with a non-JavaScript MIME ty
 which we can of course get around by configuring our webserver, but
 since we can not always configure our server, it's not really  a
 viable direction.
+
+
+
+### `esm` to the rescue
+
+Let's have a look at https://github.com/standard-things/esm and implement it!
+
+```
+⋊> pnpm i esm
+Packages: +1
++
+Resolving: total 1, reused 0, downloaded 1, done
+dependencies:
++ esm 3.0.62
+
+⋊> node -r esm main.js
+Hello, ES6
+```
+
+Tadaaa! We are done, problem solved, right? Well... almost.
+
+
+
+# References:
+
+* https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c
+* https://medium.com/@giltayar/native-es-modules-in-nodejs-status-and-future-directions-part-i-ee5ea3001f71
