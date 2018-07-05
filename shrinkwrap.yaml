@@ -1,6 +1,11 @@
 dependencies:
+  bignumber.js: 7.2.1
   esm: 3.0.62
 packages:
+  /bignumber.js/7.2.1:
+    dev: false
+    resolution:
+      integrity: sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
   /esm/3.0.62:
     dev: false
     engines:
@@ -11,4 +16,5 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 7
 shrinkwrapVersion: 3
 specifiers:
+  bignumber.js: ^7.2.1
   esm: ^3.0.62

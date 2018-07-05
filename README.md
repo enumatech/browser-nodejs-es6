@@ -325,6 +325,104 @@ Hello, ES6
 
 Tadaaa! We are done, problem solved, right? Well... almost.
 
+We do have 0 tooling for the browser, but we need a small library for Node.js:
+
+```
+du -hsc node_modules/
+264K    node_modules/
+264K    total
+```
+
+What about using third-party libraries, though?
+
+
+
+## Libraries
+
+Any real-world application, sooner or later will want to rely on some
+external libraries. Let's see what happens if we want to use arbitrary
+precision arithmetic, via [bignumber.js](https://github.com/MikeMcl/bignumber.js/)?
+
+```
+⋊> pnpm i bignumber.js
+Packages: +1
++
+Resolving: total 1, reused 0, downloaded 1, done
+dependencies:
++ bignumber.js 7.2.1
+```
+
+Let's extend our application (`app.js`), so it provides a precise addition
+function:
+
+```
+import BigNumber from 'bignumber.js'
+export function preciseAdd(a, b) { return a.plus(b) }
+```
+
+and try it from `main.js`:
+
+```
+import BigNumber from 'bignumber.js'
+const sum = App.preciseAdd(BigNumber('1.1'), BigNumber('1.3')).toString()
+console.log('Precise:', sum, ', JS: ', 1.1 + 1.3)
+```
+
+It works from Node.js:
+
+```
+⋊> node -r esm main.js
+Hello, ES6
+Precise: 2.4 , JS:  2.4000000000000004
+```
+
+But the browser says:
+
+```
+Uncaught TypeError: Failed to resolve module specifier "bignumber.js". Relative references must start with either "/", "./", or "../".
+```
+
+Indeed, we need to use relative references in the browser, so how about
+using `import BigNumber from './node_modules/bignumber.js/bignumber.js'`
+in both `app.js` and `main.js`?
+
+It works in Node.js but throws this in the browser:
+
+```
+Uncaught SyntaxError: The requested module './node_modules/bignumber.js/bignumber.js' does not provide an export named 'default'
+```
+
+The reason is that `bignumber.js` is a CommonJS module, which we can `import`
+from ES6 modules, in Node.js, but the browser doesn't understand CommonJS.
+
+There is however an ES6 formatted module in the bignumber package:
+`./node_modules/bignumber.js/bignumber.mjs`.
+
+Because of the mime-type issues seen above, we can't use it from the browser,
+so let's expose it with a `.js` extension:
+
+
+```
+⋊> ln -s ./node_modules/bignumber.js/bignumber.mjs ./bignumber.js
+```
+
+and point `app.js` & `main.js` to the link:
+
+```
+import BigNumber from './bignumber.js'
+```
+
+This works in both platforms! ...but only because we were lucky and the
+library authors packaged up an ES6 module alongside their CommonJS one.
+
+We also had to introduce extra steps of linking and we were also lucky
+that the library only had a one-file, self-contained source code, otherwise
+we couldn't have done this so easily.
+
+
+
+### CommonJS libraries
+
 
 
 # References:
