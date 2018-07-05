@@ -237,3 +237,72 @@ and reloading it, the console will indeed show:
 ```
 main.js:3 Hello, ES6
 ```
+
+
+
+### ES6 in Node.js
+
+You might have read that Node.js supports ES6 module too for quite a while, but
+it had to be enabled with the `--experimental-modules` flag and such modules
+should have the `.mjs` extension.
+
+Let's try it, but to ensure we are working with the same code in the browser
+and in Node.js, let's create a link:
+
+
+```
+⋊> ln -s main.js main.mjs
+```
+
+```
+⋊> node --experimental-modules main.mjs
+/Users/xxx/.../browser-nodejs-es6/main.js:1
+(function (exports, require, module, __filename, __dirname) { import * as App from './app.js'
+                                                              ^^^^^^
+
+SyntaxError: Unexpected token import
+    at createScript (vm.js:80:10)
+    at Object.runInThisContext (vm.js:139:10)
+    at Module._compile (module.js:616:28)
+    at Object.Module._extensions..js (module.js:663:10)
+    at Module.load (module.js:565:32)
+    at tryModuleLoad (module.js:505:12)
+    at Function.Module._load (module.js:497:3)
+    at Function.Module.runMain (module.js:693:10)
+    at startup (bootstrap_node.js:191:16)
+    at bootstrap_node.js:612:3
+```
+
+It doesn't even recognize the `import` statement. Wat?
+
+Upon close inspection we can spot that it is trying to load the `main.js`,
+so it thinks it's not an ES6 module... Let's swap the link direction then:
+
+```
+⋊> rm main.mjs
+⋊> mv main.js main.mjs
+⋊> ln -s main.mjs main.js
+⋊> node --experimental-modules main.mjs
+(node:80138) ExperimentalWarning: The ESM module loader is experimental.
+/Users/onetom/github.com/enumatech/browser-nodejs-es6/app.js:1
+(function (exports, require, module, __filename, __dirname) { export function greeting(name) { return `Hello, ${name}` }
+                                                              ^^^^^^
+
+SyntaxError: Unexpected token export
+    at createScript (vm.js:80:10)
+...
+```
+
+Now the `export` directive in `app.js` is problematic, because it thinks
+it's a CommonJS module. It still works in the browser, though.
+
+If we would try to use the `.mjs` files from the browser. we would get
+a different error:
+
+```
+Failed to load module script: The server responded with a non-JavaScript MIME type of "text/plain". Strict MIME type checking is enforced for module scripts per HTML spec.
+```
+
+which we can of course get around by configuring our webserver, but
+since we can not always configure our server, it's not really  a
+viable direction.
