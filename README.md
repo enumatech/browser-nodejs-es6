@@ -7,6 +7,42 @@ ECMAScript module support is [available](https://caniuse.com/#search=module)
 in all major browsers, since May 9, 2018, when Firefox has also officially
 enabled the feature, by default for the public.
 
+This prompted us to revisit the answer to a few questions, in the hope of
+reducing the dependencies and complexity in our JavaScript development tooling.
+
+> Q1. Can we run browser-independent application-logic code
+> both in Node.js and the browsers?
+
+The answer to this question for a long time was, *yes*, BUT you had to use some
+source code transformation tool, like [Webpack](https://webpack.js.org).
+
+So here is a more refined question:
+
+> Q2. Can we write isomorphic application-logic code without any module
+> boilerplate, like [UMD](https://github.com/umdjs/umd) preambles
+> and without using any bundlers?
+
+## Application logic
+
+Let's assume we have some super simple application-logic, which just creates a
+greeting message.
+
+Put it into an `app.js`:
+
+```
+function greeting(name) { return `Hello, ${name}` }
+```
+
+To use it from a browser, we need a HTML page hosting the app.
+Let's call it `index.html`:
+
+```html
+<script src="app.js"></script>
+```
+
+Check if it works, by `open index.html`, then type `greeting('World')` in the
+JavaScript console. It should return "Hello, World".
+
 ## Setup
 
 To ensure the same environment on every user's machine we recommend
