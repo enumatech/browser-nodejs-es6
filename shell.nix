@@ -3,7 +3,7 @@ with import (builtins.fetchTarball "https://d3g5gsiof5omrk.cloudfront.net/nixpkg
 
 mkShell rec {
   buildInputs = [
-    nodejs-8_x nodePackages_8_x.pnpm
+    nodejs-8_x nodePackages_8_x.pnpm caddy
   ];
 
   shellHook = ''

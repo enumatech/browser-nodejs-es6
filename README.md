@@ -53,6 +53,8 @@ Put it into an `app.js`:
 function greeting(name) { return `Hello, ${name}` }
 ```
 
+
+
 ### Browser
 
 To use it from a browser, we need a HTML page hosting the app.
@@ -64,6 +66,8 @@ Let's call it `index.html`:
 
 Check if it works, by `open index.html`, then type `greeting('World')` in the
 JavaScript console. It should return "Hello, World".
+
+
 
 ### Node.js
 
@@ -137,4 +141,99 @@ but now we get an error in the browser:
 
 ```
 app.js:1 Uncaught ReferenceError: module is not defined
+```
+
+
+
+### ES6 in the browser
+
+Now let's try the ES6 module format instead.
+
+Syntax is documented here:
+https://developer.mozilla.org/en-US/docs/web/javascript/reference/statements/export
+
+Check out the See also section at the bottom! It links to this great visual
+article:
+https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/
+
+There is an important difference with ES6 modules: They are loaded
+asynchronously, so you can't rely on the order of your script tags
+to encode dependencies amongst your modules!
+
+You also have to prepare the browser to receive an ES6 module, so your
+script tag in `index.html` now looks like this:
+
+```html
+<script type="module" src="app.js"></script>
+```
+
+and `app.js` becomes:
+
+```js
+export function greeting(name) { return `Hello, ${name}` }
+```
+
+We get an error though in the browser console:
+
+```
+Access to Script at 'file:///Users/xxx/.../browser-nodejs-es6/app.js' from origin 'null' has been blocked by CORS policy: Invalid response. Origin 'null' is therefore not allowed access.
+```
+
+which means we must access our web app via http:// or https:// .
+
+There is a great, self-contained, zero-config webserver called
+[caddy](https://caddyserver.com/), which we can just declare as
+a dependency in our `shell.nix` and restart our `nix-shell`, then
+run `caddy`:
+
+```
+⋊> nix-shell
+these paths will be fetched (6.01 MiB download, 34.12 MiB unpacked):
+  /nix/store/canw340mmxhpp6gkwjcz5niidhsw1rki-caddy-0.10.12-bin
+  /nix/store/cmwli8x3dgmhmv1vh1qms8d6rg99isai-caddy-0.10.12
+copying path '/nix/store/canw340mmxhpp6gkwjcz5niidhsw1rki-caddy-0.10.12-bin' from 'https://cache.nixos.org'...
+copying path '/nix/store/cmwli8x3dgmhmv1vh1qms8d6rg99isai-caddy-0.10.12' from 'https://cache.nixos.org'...
+
+⋊> caddy
+Activating privacy features... done.
+http://:2015
+```
+
+Then just `open http://localhost:2015/` and we should be able to
+evaluate `greeting('World')` again, right? Nope:
+
+```
+> Uncaught ReferenceError: greeting is not defined
+    at <anonymous>:1:1
+```
+
+what if we try to `import` our app as described in the
+[documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)?
+
+```
+> import * as App from './app.js'
+Uncaught SyntaxError: Unexpected identifier
+```
+
+`import` can't be used interactively :(
+
+Let's define a `main.js` module, which loads our app and
+exercises it too!
+
+```
+import * as App from './app.js'
+
+console.log(App.greeting('ES6'))
+```
+
+After updating `index.html` to
+
+```
+<script type="module" src="main.js"></script>
+```
+
+and reloading it, the console will indeed show:
+
+```
+main.js:3 Hello, ES6
 ```
